@@ -1,0 +1,107 @@
+plugins {
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+    id 'application'
+    id "org.gradlex.java-module-packaging" version "0.1"
+    id "org.gradlex.jvm-dependency-conflict-resolution" version "2.1.1"
+
+    id("groovy")
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+    //id("io.micronaut.application") version "4.4.2"
+    //id("io.micronaut.aot") version "4.4.2"
+}
+
+version = "1.0.0"
+group = "my"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    //runtimeOnly("org.yaml:snakeyaml")
+    compileOnly 'org.projectlombok:lombok:1.18.34'
+    annotationProcessor 'org.projectlombok:lombok:1.18.34'
+
+    testCompileOnly 'org.projectlombok:lombok:1.18.34'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
+    //annotationProcessor("io.micronaut:micronaut-http-validation")
+    //annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
+    //implementation("io.micronaut:micronaut-management")
+    //implementation("io.micronaut.rxjava3:micronaut-rxjava3")
+    //implementation("io.micronaut.serde:micronaut-serde-jackson")
+    //compileOnly("io.micronaut:micronaut-http-client")
+
+    //runtimeOnly("ch.qos.logback:logback-classic")
+    //testImplementation("io.micronaut:micronaut-http-client")
+}
+
+
+application {
+    mainClass = "my.Application"
+}
+java {
+    sourceCompatibility = JavaVersion.toVersion("21")
+    targetCompatibility = JavaVersion.toVersion("21")
+}
+
+
+javafx {
+    platform = "mac"
+    configuration = 'implementation'
+    version = "21"
+    modules = [ 'javafx.controls',
+                'javafx.web',
+                'javafx.fxml',
+                'javafx.swing',
+                'javafx.graphics',
+                'javafx.media',
+                'javafx.base',
+    ]
+}
+
+
+
+
+javaModulePackaging {
+    target("windows") {
+        operatingSystem = "windows"
+        architecture = "x86-64"
+    }
+    target("ubuntu") {
+        operatingSystem = "linux"
+        architecture = "x86-64"
+    }
+    target("macos") {
+        operatingSystem = "macos"
+        architecture = "x86-64"
+    }
+    target("macosM1") {
+        operatingSystem = "macos"
+        architecture = "aarch64"
+    }
+}
+
+jvmDependencyConflicts.patch {
+
+    ['javafx.controls',
+            'javafx.web',
+            'javafx.fxml',
+            'javafx.swing',
+            'javafx.graphics',
+            'javafx.media',
+            'javafx.base',].forEach { jfxModule ->
+
+        module("org.openjfx:javafx-$jfxModule") {
+            addTargetPlatformVariant("linux", OperatingSystemFamily.LINUX, MachineArchitecture.X86_64)
+            addTargetPlatformVariant("linux-aarch64", OperatingSystemFamily.LINUX, MachineArchitecture.ARM64)
+            addTargetPlatformVariant("mac", OperatingSystemFamily.MACOS, MachineArchitecture.X86_64)
+            addTargetPlatformVariant("mac-aarch64", OperatingSystemFamily.MACOS, MachineArchitecture.ARM64)
+            addTargetPlatformVariant("win", OperatingSystemFamily.WINDOWS, MachineArchitecture.X86_64)
+        }
+    }
+}
+application {
+    mainModule = "notebook.main"
+}
+
+
